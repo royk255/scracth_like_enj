@@ -1,0 +1,89 @@
+import pygame
+import sys
+
+# Setup
+
+HALF_SCREEN_WIDTH = 960
+HALF_SCREEN_HEIGHT = 540
+
+pygame.init()
+screen = pygame.display.set_mode((1920,  1080), pygame.RESIZABLE)
+pygame.display.set_caption("Snapping Blocks")
+clock = pygame.time.Clock()
+
+# Colors
+WHITE = (255, 255, 255)
+BLUE = (100, 149, 237)
+
+# Font
+pygame.font.init()
+FONT = pygame.font.SysFont("Arial", 24)
+
+# Block class
+class Block:
+    def __init__(self, x, y, text):
+        self.rect = pygame.Rect(x, y, 150, 50)
+        self.text = text
+        self.dragging = False
+        self.offset_x = 0
+        self.offset_y = 0
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, BLUE, self.rect, border_radius=10)
+        label = FONT.render(self.text, True, WHITE)
+        surface.blit(label, (self.rect.x + 10, self.rect.y + 15))
+
+    def handle_event(self, event, blocks):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                self.dragging = True
+                mouse_x, mouse_y = event.pos
+                self.offset_x = self.rect.x - mouse_x
+                self.offset_y = self.rect.y - mouse_y
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if self.dragging:
+                self.snap_to_blocks(blocks)
+            self.dragging = False
+
+        elif event.type == pygame.MOUSEMOTION:
+            if self.dragging:
+                mouse_x, mouse_y = event.pos
+                self.rect.x = mouse_x + self.offset_x
+                self.rect.y = mouse_y + self.offset_y
+
+    def snap_to_blocks(self, blocks):
+        for block in blocks:
+            if block is not self:
+                dx = abs(self.rect.x - block.rect.x)
+                dy = abs(self.rect.y - (block.rect.y + block.rect.height))
+                if dx < 20 and dy < 20:
+                    self.rect.x = block.rect.x
+                    self.rect.y = block.rect.y + block.rect.height
+
+# Create blocks
+blocks = [
+    Block(100, 100, "Move 10 Steps"),
+    Block(300, 100, "Jump"),
+]
+
+# Main loop
+running = True
+while running:
+    screen.fill(WHITE)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        for block in blocks:
+            block.handle_event(event, blocks)
+
+    for block in blocks:
+        block.draw(screen)
+
+    pygame.display.flip()
+    clock.tick(60)
+
+pygame.quit()
+sys.exit()
