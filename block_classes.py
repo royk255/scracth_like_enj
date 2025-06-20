@@ -2,6 +2,7 @@ import pygame
 import sys
 import os
 import defines
+#from button_class import Button
 
 
 
@@ -10,6 +11,17 @@ pygame.init()
 screen = pygame.display.set_mode((defines.FULL_SCREEN_WIDTH,  defines.FULL_SCREEN_HEIGHT), pygame.RESIZABLE)
 pygame.display.set_caption("Snapping Blocks")
 clock = pygame.time.Clock()
+
+action = False
+
+def blit_alpha(target, source, location, opacity):
+        x = location[0]
+        y = location[1]
+        temp = pygame.Surface((source.get_width(), source.get_height()), pygame.SRCALPHA).convert()
+        temp.blit(target, (-x, -y))
+        temp.blit(source, (0, 0))
+        temp.set_alpha(opacity)        
+        target.blit(temp, location)
 
 
 # Font
@@ -21,6 +33,13 @@ list_of_characters = []
 
 line = pygame.Rect(1600, 0, 20, 1080)  # Vertical line on the right
 SAFE_BLOCKS_LOC = line.x + 50 
+
+#green_button = pygame.Rect(defines.HALF_SCREEN_WIDTH-300, 50, 50, 50)  # x, y, width, height
+#red_button = pygame.Rect(defines.HALF_SCREEN_WIDTH-225, 50, 50, 50)
+
+#green_button = Button(defines.HALF_SCREEN_WIDTH-300, 50, 50, 50, "Run")
+#red_button = Button(defines.HALF_SCREEN_WIDTH-225, 50, 50, 50, "Stop")
+
 
 
 class Block:
@@ -120,6 +139,8 @@ class Block:
         pass
     
 
+
+
 class BlockType(Block):
     def __init__(self, x, y, text, type, size, color=defines.BLUE):
         super().__init__(x, y, text, type, size, color) 
@@ -156,7 +177,14 @@ class Character:
         self.rect = self.image.get_rect(topleft=(self.x, self.y))
 
     def draw(self, surface):
-        surface.blit(self.image, (self.x, self.y))
+        self.image.set_alpha(255)
+        if self.facing_right:
+            #blit_alpha(surface, self.image, (self.x, self.y), 255)
+            surface.blit(self.image, (self.x, self.y))
+        else:
+            #blit_alpha(surface, pygame.transform.flip(self.image, True, False), (self.x, self.y), 255)
+            surface.blit(pygame.transform.flip(self.image, True, False), (self.x, self.y))
+        #surface.blit(self.image, (self.x, self.y))
 
     def move(self, dx, dy):
         self.x += dx
@@ -189,7 +217,7 @@ class Character:
     def collides_with(self, other_rect):
         return self.rect.colliderect(other_rect)
 
-list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character.jpg", 100, 100))
+list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character_2.png", 0, 0))
 
 
 class move_character(BlockType):
@@ -199,10 +227,20 @@ class move_character(BlockType):
         self.param1 = 10
         self.has_param = 1
 
-    def logic(self):
+    def start(self):
         self.get_input()
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 10")
+            self.param1 = 10
         print(self.param1)
-        pass
+    
+    def logic(self):
+        Character.move(self.character, self.param1, 0)
+        
+
+
 
 class turn_character(BlockType):
     def __init__(self, x, y, size, character, color=defines.BLUE):
@@ -211,9 +249,16 @@ class turn_character(BlockType):
         self.param1 = 10
         self.has_param = 1
 
+    def start(self):
+        self.get_input()
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 10")
+            self.param1 = 10
+        print(self.param1)
 
     def logic(self):
-        self.get_input()
         print(self.param1)
         pass
 
@@ -236,6 +281,14 @@ def add_blocks():
         else:
             blocks.append(BlockType(x, y, blocks_text[i], "Motion", (150, 50)))
 
+
+def draw_other_blocks():
+    pygame.draw.rect(screen, defines.BLACK, line)
+    #pygame.draw.rect(screen, defines.GREEN, green_button)  # Green button
+    #pygame.draw.rect(screen, defines.RED, red_button)    # Red button
+
+
+
 def main():
     running = True
     add_blocks()
@@ -250,9 +303,21 @@ def main():
         screen.fill(defines.WHITE)
         for block in blocks:
             block.draw(screen)
+        for character in list_of_characters:
+            character.draw(screen)
 
         # Draw the vertical line
-        pygame.draw.rect(screen, defines.BLACK, line)
+        #pygame.draw.rect(screen, defines.BLACK, line)
+        draw_other_blocks()
+
+        #play logic for each block
+        #action_button()
+        if True:
+            for block in blocks:
+                if isinstance(block, move_character):
+                    block.logic()
+                elif isinstance(block, turn_character):
+                    block.logic()
 
         pygame.display.flip()
         clock.tick(60)
