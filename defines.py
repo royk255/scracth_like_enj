@@ -5,9 +5,21 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 PURPLE = (128, 0, 128)
 YELLOW = (255, 255, 0)
+PINK = (255, 192, 203)
+ORANGE = (255, 165, 0)
+AQUA = (0, 255, 255)
 FULL_SCREEN_WIDTH = 1920
 FULL_SCREEN_HEIGHT = 1080
 HALF_SCREEN_WIDTH =  FULL_SCREEN_WIDTH // 2
 HALF_SCREEN_HEIGHT = FULL_SCREEN_HEIGHT // 2
 
-
+types_colors = {
+    "motion": BLUE,
+    "look": PURPLE,
+    "sound": PINK,
+    "ebvent": YELLOW,
+    "control": ORANGE,
+    "sensing": AQUA,
+    "operators": GREEN,
+    "variables": RED
+}

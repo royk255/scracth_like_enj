@@ -4,6 +4,8 @@ import os
 import defines
 #from button_class import Button
 import button_class
+#import character_class
+from character_class import Character
 
 
 
@@ -44,7 +46,7 @@ red_button = button_class.Button(defines.HALF_SCREEN_WIDTH-225, 50, 50, 50, "Sto
 
 
 class Block:
-    def __init__(self, x, y, text, type, size, color=defines.BLUE):
+    def __init__(self, x, y, text, type, size, character, color=defines.BLUE):
         self.rect = pygame.Rect(x, y, size[0], size[1])
         self.text = text
         self.dragging = False
@@ -52,6 +54,7 @@ class Block:
         self.offset_y = 0
         self.color = color
         self.type = type
+        self.character = character
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=10)
@@ -88,6 +91,7 @@ class Block:
                 if dx < 20 and dy < 20:
                     self.rect.x = block.rect.x
                     self.rect.y = block.rect.y + block.rect.height
+                    
     
     def get_input(self):
         screen_input = pygame.display.set_mode((300, 200), pygame.RESIZABLE)
@@ -138,93 +142,32 @@ class Block:
 
     def logic(self):
         pass
+
+    def start(self):
+        pass
     
 
-
-
 class BlockType(Block):
-    def __init__(self, x, y, text, type, size, color=defines.BLUE):
-        super().__init__(x, y, text, type, size, color) 
+    def __init__(self, x, y, text, type, size, character, color=defines.BLUE):
+        super().__init__(x, y, text, type, size, character, defines.types_colors[type.lower()]) 
         self.type = type
 
     def logic(self):
         # Implement specific logic for different block types if needed
         pass
 
+    def start(self):
+        pass
 
-class Character:
-    def __init__(self, image_path, x=0, y=0, rotation=0, scale=1.0, facing_right=True):
-        self.image_original = pygame.image.load(image_path).convert_alpha()
-        self.character_name = os.path.splitext(os.path.basename(image_path))[0]
-        self.scale = scale
-        if scale != 1.0:
-            w, h = self.image_original.get_size()
-            self.image_original = pygame.transform.smoothscale(
-                self.image_original, (int(w * scale), int(h * scale))
-            )
-        self.facing_right = facing_right
-        self.image = self.image_original
-        self.x = x
-        self.y = y
-        self.rotation = rotation
-        self.update_rect()
-        self.cmds = []
 
-    def update_rect(self):
-        img = pygame.transform.rotate(self.image_original, -self.rotation)
-        if not self.facing_right:
-            img = pygame.transform.flip(img, True, False)
-        self.image = img
-        self.rect = self.image.get_rect(topleft=(self.x, self.y))
 
-    def draw(self, surface):
-        self.image.set_alpha(255)
-        if self.facing_right:
-            #blit_alpha(surface, self.image, (self.x, self.y), 255)
-            surface.blit(self.image, (self.x, self.y))
-        else:
-            #blit_alpha(surface, pygame.transform.flip(self.image, True, False), (self.x, self.y), 255)
-            surface.blit(pygame.transform.flip(self.image, True, False), (self.x, self.y))
-        #surface.blit(self.image, (self.x, self.y))
-
-    def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
-        self.update_rect()
-
-    def set_position(self, x, y):
-        self.x = x
-        self.y = y
-        self.update_rect()
-
-    def set_rotation(self, angle):
-        self.rotation = angle % 360
-        self.update_rect()
-
-    def flip(self):
-        self.facing_right = not self.facing_right
-        self.update_rect()
-
-    def set_direction(self, right=True):
-        self.facing_right = right
-        self.update_rect()
-
-    def get_direction(self):
-        return "right" if self.facing_right else "left"
-
-    def get_hitbox(self):
-        return self.rect
-
-    def collides_with(self, other_rect):
-        return self.rect.colliderect(other_rect)
 
 list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character_2.png", 0, 0))
 
 
 class move_character(BlockType):
-    def __init__(self, x, y, size, character, color=defines.BLUE):
-        super().__init__(x, y, "move_character", "Motion", size, color)
-        self.character = character
+    def __init__(self, x, y, size, character):
+        super().__init__(x, y, "move_character", "Motion", size, character)
         self.param1 = 10
         self.has_param = 1
 
@@ -244,8 +187,8 @@ class move_character(BlockType):
 
 
 class turn_character(BlockType):
-    def __init__(self, x, y, size, character, color=defines.BLUE):
-        super().__init__(x, y, "turn_character", "Motion", size, color)
+    def __init__(self, x, y, size, character):
+        super().__init__(x, y, "turn_character", "Motion", size, character)
         self.character = character
         self.param1 = 10
         self.has_param = 1
@@ -280,7 +223,7 @@ def add_blocks():
         elif blocks_text[i] == "Turn Left":
             blocks.append(turn_character(x, y, (150, 50), list_of_characters[0]))
         else:
-            blocks.append(BlockType(x, y, blocks_text[i], "Motion", (150, 50)))
+            blocks.append(BlockType(x, y, blocks_text[i], "Motion", (150, 50), list_of_characters[0]))
 
 
 def draw_other_blocks():
