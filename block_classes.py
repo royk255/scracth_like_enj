@@ -3,6 +3,7 @@ import sys
 import os
 import defines
 #from button_class import Button
+import button_class
 
 
 
@@ -37,8 +38,8 @@ SAFE_BLOCKS_LOC = line.x + 50
 #green_button = pygame.Rect(defines.HALF_SCREEN_WIDTH-300, 50, 50, 50)  # x, y, width, height
 #red_button = pygame.Rect(defines.HALF_SCREEN_WIDTH-225, 50, 50, 50)
 
-#green_button = Button(defines.HALF_SCREEN_WIDTH-300, 50, 50, 50, "Run")
-#red_button = Button(defines.HALF_SCREEN_WIDTH-225, 50, 50, 50, "Stop")
+green_button = button_class.Button(defines.HALF_SCREEN_WIDTH-300, 50, 50, 50, "Run")
+red_button = button_class.Button(defines.HALF_SCREEN_WIDTH-225, 50, 50, 50, "Stop")
 
 
 
@@ -286,7 +287,23 @@ def draw_other_blocks():
     pygame.draw.rect(screen, defines.BLACK, line)
     #pygame.draw.rect(screen, defines.GREEN, green_button)  # Green button
     #pygame.draw.rect(screen, defines.RED, red_button)    # Red button
+    green_button.draw(screen)
+    red_button.draw(screen)
 
+def action_button(event):
+    green_button.handle_event(event)
+    if green_button.on:
+        global action
+        action = True
+        print("Action button pressed, starting logic execution.")
+        green_button.turn_off()
+        red_button.turn_off()
+    red_button.handle_event(event)
+    if red_button.on:
+        action = False
+        print("Action button released, stopping logic execution.")
+        green_button.turn_off()
+        red_button.turn_off()
 
 
 def main():
@@ -300,6 +317,8 @@ def main():
             for block in blocks:
                 block.handle_event(event, blocks)
 
+            action_button(event)
+
         screen.fill(defines.WHITE)
         for block in blocks:
             block.draw(screen)
@@ -311,8 +330,8 @@ def main():
         draw_other_blocks()
 
         #play logic for each block
-        #action_button()
-        if True:
+
+        if action:
             for block in blocks:
                 if isinstance(block, move_character):
                     block.logic()

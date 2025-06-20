@@ -20,11 +20,20 @@ class Button:
             self.hovered = self.rect.collidepoint(event.pos)
         elif event.type == pygame.MOUSEBUTTONDOWN and self.hovered:
             print(f"Button '{self.text}' clicked!")
+            self.on = True
 
     def turn_on(self):
         self.on = True
         print(f"Button '{self.text}' turned on.")
-        
+
     def turn_off(self):
         self.on = False
         print(f"Button '{self.text}' turned off.")
+
+    def detect_click(self, mouse_pos):
+        
+        if self.rect.collidepoint(mouse_pos):
+            self.on = not self.on
+            print(f"Button '{self.text}' toggled to {'on' if self.on else 'off'}.")
+            return True
+        return False
