@@ -65,3 +65,11 @@ class Character:
 
     def collides_with(self, other_rect):
         return self.rect.colliderect(other_rect)
+    
+    def print_cmds(self):
+        print(f"Commands for {self.character_name}:")
+        for cmd in self.cmds:
+            print(cmd)
+            print("cmd length:", len(cmd))
+        print("-----------------------")
+        print(self.cmds)

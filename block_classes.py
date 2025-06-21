@@ -66,11 +66,12 @@ class Block:
             if self.rect.collidepoint(event.pos):
                 if self.rect.x < SAFE_BLOCKS_LOC:
                     self.dragging = True
-                    mouse_x, mouse_y = event.pos
-                    self.offset_x = self.rect.x - mouse_x
-                    self.offset_y = self.rect.y - mouse_y
+                    #mouse_x, mouse_y = event.pos
+                    #self.offset_x = self.rect.x - mouse_x
+                    #self.offset_y = self.rect.y - mouse_y
+                    self.update_folowing(self.get_following(), event)
                 else:
-                    blocks.append(Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.color))
+                    blocks.append(Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.character, self.color))
                     self.character.cmds.append([blocks[-1]])
 
         elif event.type == pygame.MOUSEBUTTONUP:
@@ -83,6 +84,7 @@ class Block:
                 mouse_x, mouse_y = event.pos
                 self.rect.x = mouse_x + self.offset_x
                 self.rect.y = mouse_y + self.offset_y
+                self.update_following2(self.get_following(), event)
 
     def snap_to_blocks(self, blocks):
         for block in blocks:
@@ -93,13 +95,20 @@ class Block:
                     self.rect.x = block.rect.x
                     self.rect.y = block.rect.y + block.rect.height
                     #self.character.cmds[0].append #----
-
-    def stack_block(self, c_block, snap):
-        for li in self.character.cmds:
-            for block in li:
-                if li[block] is c_block:
-                    block.append(self)
+                    self.stack_block(block, True)
                     return
+        self.stack_block()
+
+    def stack_block(self, c_block=None, snap=False):
+        follwing = self.get_following()
+        self.remove_list(follwing)
+        if c_block is None:
+            self.join_list(0, follwing, snap)
+        else:
+            li, place = self.find_block(c_block)
+            self.join_list(li, follwing, snap)
+        self.clean_up()
+        self.character.print_cmds()
 
     def find_block(self, block):
         for li in self.character.cmds:
@@ -108,19 +117,49 @@ class Block:
                     return (li,blo)
         return None
     
-    def join_list(self, ind1, following, snap):
+    def join_list(self, li, following, snap):
         if snap:
-            for bloc in self.character.cmds[ind1]:
-                self.character.cmds[ind1].append(bloc)
+            li += following
         else:
             self.character.cmds.append(following)
 
     def remove_list(self, following):
-        ind,place = self.find_block(following[0])
-        for block in self.character.cmds[ind]:
-            pass
+        li,place = self.find_block(following[0])
+        if li[0] == following[0]:
+            li[:] = []
+            return
+        li[:] = li[:li.index(place)]
+        
 
+    def get_following(self):
+        li,place = self.find_block(self)
+        following = li[li.index(place):]      
+        return following
+            
+    def clean_up(self):
+        for li in self.character.cmds:
+            if len(li) == 0:
+                self.character.cmds.remove(li)
 
+    def update_position(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
+    def get_position(self):
+        return self.rect.x, self.rect.y
+    
+    def update_folowing(self, following,event):
+        #li, place = self.find_block(following[0])
+        for i,li in enumerate(following):
+            mouse_x, mouse_y = event.pos
+            li.offset_x = li.rect.x - mouse_x
+            li.offset_y = li.rect.y - mouse_y# + i *50
+    
+    def update_following2(self, following, event):
+        for i,li in enumerate(following):
+            mouse_x, mouse_y = event.pos
+            li.rect.x = mouse_x + li.offset_x
+            li.rect.y = mouse_y + li.offset_y
+            
 
                     
     
