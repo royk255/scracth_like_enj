@@ -71,6 +71,7 @@ class Block:
                     self.offset_y = self.rect.y - mouse_y
                 else:
                     blocks.append(Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.color))
+                    self.character.cmds.append([blocks[-1]])
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if self.dragging:
@@ -91,6 +92,36 @@ class Block:
                 if dx < 20 and dy < 20:
                     self.rect.x = block.rect.x
                     self.rect.y = block.rect.y + block.rect.height
+                    #self.character.cmds[0].append #----
+
+    def stack_block(self, c_block, snap):
+        for li in self.character.cmds:
+            for block in li:
+                if li[block] is c_block:
+                    block.append(self)
+                    return
+
+    def find_block(self, block):
+        for li in self.character.cmds:
+            for blo in li:
+                if blo is block:
+                    return (li,blo)
+        return None
+    
+    def join_list(self, ind1, following, snap):
+        if snap:
+            for bloc in self.character.cmds[ind1]:
+                self.character.cmds[ind1].append(bloc)
+        else:
+            self.character.cmds.append(following)
+
+    def remove_list(self, following):
+        ind,place = self.find_block(following[0])
+        for block in self.character.cmds[ind]:
+            pass
+
+
+
                     
     
     def get_input(self):
