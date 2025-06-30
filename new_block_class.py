@@ -1,0 +1,166 @@
+import pygame
+import defines
+import os
+import sys
+import block_classes
+
+
+class Block:
+    def __init__(self, x, y, text, type, size, color=defines.BLUE):
+        self.rect = pygame.Rect(x, y, size[0], size[1])
+        self.text = text
+        self.dragging = False
+        self.offset_x = 0
+        self.offset_y = 0
+        self.color = color
+        self.type = type
+
+    def draw(self, surface):
+        pygame.draw.rect(surface, self.color, self.rect, border_radius=10)
+        label = defines.FONT.render(self.text, True, defines.WHITE)
+        surface.blit(label, (self.rect.x + 10, self.rect.y + 15))
+
+    def handle_event(self, event, blocks):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            if self.rect.collidepoint(event.pos):
+                if self.rect.x < defines.SAFE_BLOCKS_LOC:
+                    self.dragging = True
+                    mouse_x, mouse_y = event.pos
+                    self.offset_x = self.rect.x - mouse_x
+                    self.offset_y = self.rect.y - mouse_y
+                else:
+                    #blocks.append(Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.character, self.color))
+                    new_block = Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.color)
+                    blocks.append(new_block)
+
+        elif event.type == pygame.MOUSEBUTTONUP:
+            if self.dragging:
+                #self.snap_to_blocks(blocks)
+                return True
+            self.dragging = False
+            return False
+
+        elif event.type == pygame.MOUSEMOTION:
+            if self.dragging:
+                mouse_x, mouse_y = event.pos
+                self.rect.x = mouse_x + self.offset_x
+                self.rect.y = mouse_y + self.offset_y
+    def update_position(self, x, y):
+        self.rect.x = x
+        self.rect.y = y
+    def get_position(self):
+        return self.rect.x, self.rect.y
+
+    def get_input(self):
+        screen_input = pygame.display.set_mode((300, 200), pygame.RESIZABLE)
+        font = pygame.font.Font(None, 32)
+        clock = pygame.time.Clock()
+        input_box = pygame.Rect(50, 100, 140, 32)
+        color_inactive = pygame.Color('lightskyblue3')
+        color_active = pygame.Color('dodgerblue2')
+        color = color_inactive
+        active = False
+        text = ''
+        done = False
+
+        while not done:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    done = True
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if input_box.collidepoint(event.pos):
+                        active = not active
+                    else:
+                        active = False
+                    color = color_active if active else color_inactive
+                elif event.type == pygame.KEYDOWN:
+                    if active:
+                        if event.key == pygame.K_RETURN:
+                            print(text)
+                            self.param1 = text
+                            done = True
+                        elif event.key == pygame.K_BACKSPACE:
+                            text = text[:-1]
+                        else:
+                            text += event.unicode
+
+            screen_input.fill(defines.WHITE)
+            # Render and blit the label so it's visible
+            label = defines.FONT.render("Enter a value:", True, defines.BLACK)
+            screen_input.blit(label, (50, 50))
+            # Render the current text.
+            txt_surface = font.render(text, True, color)
+            width = max(200, txt_surface.get_width()+10)
+            input_box.w = width
+            screen_input.blit(txt_surface, (input_box.x+5, input_box.y+5))
+            pygame.draw.rect(screen_input, color, input_box, 2)
+
+            pygame.display.flip()
+            clock.tick(30)
+
+    def logic(self, target):
+        pass
+
+    def start(self):
+        pass
+
+
+class BlockType(Block):
+    def __init__(self, x, y, text, type, size, character, color=defines.BLUE):
+        super().__init__(x, y, text, type, size, character, defines.types_colors[type.lower()]) 
+        self.type = type
+
+    def logic(self):
+        # Implement specific logic for different block types if needed
+        pass
+
+    def start(self):
+        pass
+
+
+class move_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "move_character", "Motion", size)
+        self.param1 = 10
+        self.has_param = 1
+
+    def start(self):
+        self.get_input()
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 10")
+            self.param1 = 10
+        print(self.param1)
+    
+    def logic(self, target):
+        target.move(target.param1, 0)
+        
+
+
+
+class turn_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "turn_character", "Motion", size)
+        self.param1 = 10
+        self.has_param = 1
+
+    def start(self):
+        self.get_input()
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 10")
+            self.param1 = 10
+        print(self.param1)
+
+    def logic(self, target):
+        print(self.param1)
+        pass
+
+
+
+
+
+
+

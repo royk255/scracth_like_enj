@@ -73,3 +73,72 @@ class Character:
             print("cmd length:", len(cmd))
         print("-----------------------")
         print(self.cmds)
+
+    def snap_to_blocks(self, block):
+        blocks = []
+        for li in self.character.cmds:
+            _block = li[-1]
+            if _block == block:
+                continue
+            dx = abs(block.rect.x - _block.rect.x)
+            dy = abs(block.rect.y - (_block.rect.y + _block.rect.height))
+            if dx < 20 and dy < 20:
+                block.rect.x = _block.rect.x
+                block.rect.y = _block.rect.y + _block.rect.height
+                #self.character.cmds[0].append #----
+                self.stack_block(_block, True)
+                return
+        self.stack_block()
+
+    def stack_block(self, block, t_block=None, snap=False):
+        follwing = self.get_following(block)
+        self.remove_list(follwing)
+        if t_block is None:
+            self.join_list(0, follwing, snap)
+        else:
+            li, place = self.find_block(t_block)
+            self.join_list(li, follwing, snap)
+        self.clean_up()
+        self.character.print_cmds()
+
+    def find_block(self, block):
+        for li in self.cmds:
+            for blo in li:
+                if blo is block:
+                    return (li,blo)
+        return None
+
+    def join_list(self, li, following, snap):
+        if snap:
+            li += following
+        else:
+            self.character.cmds.append(following)
+
+    def remove_list(self, following):
+        li,place = self.find_block(following[0])
+        if li[0] == following[0]:
+            li[:] = []
+            return
+        li[:] = li[:li.index(place)]
+        
+
+    def get_following(self, block):
+        li,place = self.find_block(block)
+        following = li[li.index(place):]      
+        return following
+            
+    def clean_up(self):
+        for li in self.cmds:
+            if len(li) == 0:
+                self.cmds.remove(li)
+
+    def add_block_to_cmds(self, block):
+        self.cmds.append(block)
+        #self.character.print_cmds()
+
+    def active_logic(self):
+        for li in self.cmds:
+            for block in li:
+                if hasattr(block, 'logic'):
+                    block.logic()
+    

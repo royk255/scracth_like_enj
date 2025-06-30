@@ -31,6 +31,7 @@ def blit_alpha(target, source, location, opacity):
 pygame.font.init()
 FONT = pygame.font.SysFont("Arial", 24)
 
+
 blocks = []
 list_of_characters = []
 

@@ -12,6 +12,25 @@ FULL_SCREEN_WIDTH = 1920
 FULL_SCREEN_HEIGHT = 1080
 HALF_SCREEN_WIDTH =  FULL_SCREEN_WIDTH // 2
 HALF_SCREEN_HEIGHT = FULL_SCREEN_HEIGHT // 2
+LINE_X = 1600
+SAFE_BLOCKS_LOC = LINE_X + 50 
+
+BLOCKS_TEXT = [
+    "Move 10 Steps",
+    "Jump",
+    "Turn Left",
+    "Turn Right",
+    "Move Backward"
+]
+
+
+import pygame
+import sys
+import os
+pygame.font.init()
+FONT = pygame.font.SysFont("Arial", 24)
+
+
 
 types_colors = {
     "motion": BLUE,
