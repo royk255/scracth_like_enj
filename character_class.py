@@ -76,7 +76,7 @@ class Character:
 
     def snap_to_blocks(self, block):
         blocks = []
-        for li in self.character.cmds:
+        for li in self.cmds:
             _block = li[-1]
             if _block == block:
                 continue
@@ -86,9 +86,9 @@ class Character:
                 block.rect.x = _block.rect.x
                 block.rect.y = _block.rect.y + _block.rect.height
                 #self.character.cmds[0].append #----
-                self.stack_block(_block, True)
+                self.stack_block(block,_block, True)
                 return
-        self.stack_block()
+        self.stack_block(block)
 
     def stack_block(self, block, t_block=None, snap=False):
         follwing = self.get_following(block)
@@ -99,7 +99,7 @@ class Character:
             li, place = self.find_block(t_block)
             self.join_list(li, follwing, snap)
         self.clean_up()
-        self.character.print_cmds()
+        self.print_cmds()
 
     def find_block(self, block):
         for li in self.cmds:
@@ -112,7 +112,7 @@ class Character:
         if snap:
             li += following
         else:
-            self.character.cmds.append(following)
+            self.cmds.append(following)
 
     def remove_list(self, following):
         li,place = self.find_block(following[0])
@@ -139,6 +139,18 @@ class Character:
     def active_logic(self):
         for li in self.cmds:
             for block in li:
-                if hasattr(block, 'logic'):
-                    block.logic()
-    
+                block.logic(self)
+
+    def update_following_offset(self, following,event):
+            #li, place = self.find_block(following[0])
+            for i,block in enumerate(following):
+                mouse_x, mouse_y = event.pos
+                block.offset_x = block.rect.x - mouse_x
+                block.offset_y = block.rect.y - mouse_y# + i *50
+
+
+    def update_following_pos(self, following, event):
+        for i,block in enumerate(following):
+            mouse_x, mouse_y = event.pos
+            block.rect.x = mouse_x + block.offset_x
+            block.rect.y = mouse_y + block.offset_y

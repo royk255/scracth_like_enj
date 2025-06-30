@@ -15,6 +15,9 @@ class Block:
         self.color = color
         self.type = type
 
+    def dup(self):
+        pass
+
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect, border_radius=10)
         label = defines.FONT.render(self.text, True, defines.WHITE)
@@ -30,21 +33,26 @@ class Block:
                     self.offset_y = self.rect.y - mouse_y
                 else:
                     #blocks.append(Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.character, self.color))
-                    new_block = Block(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT, self.text, self.type, (150, 50), self.color)
+                    new_block = self.dup()
+                    new_block.update_position(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT)
                     blocks.append(new_block)
+            return 3
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if self.dragging:
                 #self.snap_to_blocks(blocks)
-                return True
+                self.dragging = False
+                return 1
             self.dragging = False
-            return False
+            return 0
 
         elif event.type == pygame.MOUSEMOTION:
             if self.dragging:
-                mouse_x, mouse_y = event.pos
-                self.rect.x = mouse_x + self.offset_x
-                self.rect.y = mouse_y + self.offset_y
+                #mouse_x, mouse_y = event.pos
+                #self.rect.x = mouse_x + self.offset_x
+                #self.rect.y = mouse_y + self.offset_y
+                return 2
+            
     def update_position(self, x, y):
         self.rect.x = x
         self.rect.y = y
@@ -106,8 +114,8 @@ class Block:
 
 
 class BlockType(Block):
-    def __init__(self, x, y, text, type, size, character, color=defines.BLUE):
-        super().__init__(x, y, text, type, size, character, defines.types_colors[type.lower()]) 
+    def __init__(self, x, y, text, type, size, color=defines.BLUE):
+        super().__init__(x, y, text, type, size, defines.types_colors[type.lower()]) 
         self.type = type
 
     def logic(self):
@@ -123,6 +131,9 @@ class move_character(BlockType):
         super().__init__(x, y, "move_character", "Motion", size)
         self.param1 = 10
         self.has_param = 1
+    
+    def dup(self):
+        return move_character(self.rect.x, self.rect.y, self.rect.size)
 
     def start(self):
         self.get_input()
@@ -134,7 +145,7 @@ class move_character(BlockType):
         print(self.param1)
     
     def logic(self, target):
-        target.move(target.param1, 0)
+        target.move(self.param1, 0)
         
 
 

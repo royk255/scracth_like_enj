@@ -1,6 +1,6 @@
 import pygame
 import defines
-import block_classes
+import new_block_class as block_classes
 
 
 
@@ -12,9 +12,9 @@ def add_blocks(blocks, current_character):
         x = defines.SAFE_BLOCKS_LOC 
         y = 20 + (i * 60)  
         if defines.BLOCKS_TEXT[i] == "Move 10 Steps":
-            blocks.append(block_classes.move_character(x, y, (150, 50), current_character))
+            blocks.append(block_classes.move_character(x, y, (150, 50)))
         elif defines.BLOCKS_TEXT[i] == "Turn Left":
-            blocks.append(block_classes.turn_character(x, y, (150, 50), current_character))
+            blocks.append(block_classes.turn_character(x, y, (150, 50)))
         else:
             blocks.append(block_classes.BlockType(x, y, defines.BLOCKS_TEXT[i], "Motion", (150, 50), current_character))
 

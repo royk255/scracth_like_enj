@@ -58,14 +58,19 @@ def main():
 
             for block in side_blocks:
                 block.handle_event(event, add_block)
+                
             if len(add_block) > 0:
                 character.add_block_to_cmds(add_block)
 
             for li in character.cmds:
                 for block in li:
-                    if block.handle_event(event, add_block):
+                    res = block.handle_event(event, add_block)
+                    if res == 1:
                         character.snap_to_blocks(block)
-            
+                    elif res == 2:
+                        character.update_following_pos(character.get_following(block),event)
+                    elif res == 3:
+                        character.update_following_offset(character.get_following(block), event)
 
             action_button(event)
 

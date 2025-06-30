@@ -161,6 +161,7 @@ class Block:
             li.rect.x = mouse_x + li.offset_x
             li.rect.y = mouse_y + li.offset_y
             
+            
 
                     
     
