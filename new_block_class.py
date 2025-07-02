@@ -60,53 +60,6 @@ class Block:
     def get_position(self):
         return self.rect.x, self.rect.y
 
-    def get_input(self):
-        screen_input = pygame.display.set_mode((300, 200), pygame.RESIZABLE)
-        font = pygame.font.Font(None, 32)
-        clock = pygame.time.Clock()
-        input_box = pygame.Rect(50, 100, 140, 32)
-        color_inactive = pygame.Color('lightskyblue3')
-        color_active = pygame.Color('dodgerblue2')
-        color = color_inactive
-        active = False
-        text = ''
-        done = False
-
-        while not done:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    done = True
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if input_box.collidepoint(event.pos):
-                        active = not active
-                    else:
-                        active = False
-                    color = color_active if active else color_inactive
-                elif event.type == pygame.KEYDOWN:
-                    if active:
-                        if event.key == pygame.K_RETURN:
-                            print(text)
-                            self.param1 = text
-                            done = True
-                        elif event.key == pygame.K_BACKSPACE:
-                            text = text[:-1]
-                        else:
-                            text += event.unicode
-
-            screen_input.fill(defines.WHITE)
-            # Render and blit the label so it's visible
-            label = defines.FONT.render("Enter a value:", True, defines.BLACK)
-            screen_input.blit(label, (50, 50))
-            # Render the current text.
-            txt_surface = font.render(text, True, color)
-            width = max(200, txt_surface.get_width()+10)
-            input_box.w = width
-            screen_input.blit(txt_surface, (input_box.x+5, input_box.y+5))
-            pygame.draw.rect(screen_input, color, input_box, 2)
-
-            pygame.display.flip()
-            clock.tick(30)
-
     def logic(self, target):
         pass
 
@@ -136,11 +89,14 @@ class move_character(BlockType):
         self.param1 = 100
         self.has_param = 1
     
+    def get_par(self):
+        return {"steps" : self.param1}
+    
     def dup(self):
         return move_character(self.rect.x, self.rect.y, self.rect.size)
 
-    def start(self):
-        self.get_input()
+    def start(self, parm):
+        self.param1 = parm["steps"]
         if self.param1.isdigit():
             self.param1 = int(self.param1)
         else:
@@ -186,6 +142,8 @@ class jump_character(BlockType):
     def dup(self):
         return jump_character(self.rect.x, self.rect.y, self.rect.size)
     
+    def get_par(self):
+        return {"steps" : self.param1}
 
     def start(self):
         self.get_input()
@@ -209,11 +167,14 @@ class wait_character(BlockType):
         self.param1 = 1
         self.has_param = 1
 
+    def get_par(self):
+        return {"wait" : self.param1}
+
     def dup(self):
         return wait_character(self.rect.x, self.rect.y, self.rect.size)   
 
-    def start(self):
-        self.get_input()
+    def start(self, parm_dic):
+        self.param1 = parm_dic["wait"]
         if self.param1.isdigit():
             self.param1 = int(self.param1)
         else:

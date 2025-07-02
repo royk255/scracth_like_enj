@@ -70,8 +70,8 @@ class Character:
         print(f"Commands for {self.character_name}:")
         for cmd in self.cmds:
             print(cmd)
-            print("cmd length:", len(cmd))
-        print("-----------------------")
+            #print("cmd length:", len(cmd))
+        #print("-----------------------")
         print(self.cmds)
 
     def snap_to_blocks(self, block):

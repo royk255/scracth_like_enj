@@ -15,13 +15,15 @@ import time
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
-screen = pygame.display.set_mode((defines.FULL_SCREEN_WIDTH,  defines.FULL_SCREEN_HEIGHT), pygame.RESIZABLE)
+screen = pygame.display.set_mode((defines.FULL_SCREEN_WIDTH,  defines.FULL_SCREEN_HEIGHT-50), pygame.RESIZABLE)
 pygame.display.set_caption("Snapping Blocks")
 clock = pygame.time.Clock()
 #FONT = pygame.font.SysFont("Arial", 24)
 
 # Define the action variable before use
 action = False
+
+#screen_2 = pygame.display.set_mode((defines.FULL_SCREEN_WIDTH,  defines.FULL_SCREEN_HEIGHT-50), pygame.RESIZABLE)
 
 
 
@@ -50,14 +52,17 @@ def draw_blocks(blocks, screen):
 
 def main():
     list_of_characters = []
-    list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character_2.png", 200, 200))
+    list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character_2.png", 100, 100))
     character = list_of_characters[0]
     running = True
     side_blocks = []
     global action
+    l_t = []
+    l_b = None
     other_functions.add_blocks(side_blocks, character)
     while running:
         add_block = []
+        
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -71,12 +76,27 @@ def main():
             for li in character.cmds:
                 for block in li:
                     res = block.handle_event(event, add_block)
-                    if res == 1:
+                    if res == 1:  #up
                         character.snap_to_blocks(block)
-                    elif res == 2:
+                    elif res == 2: #move
                         character.update_following_pos(character.get_following(block),event)
-                    elif res == 3:
+                    elif res == 3: #down
                         character.update_following_offset(character.get_following(block), event)
+                        if len(l_t) < 2:
+                            l_t.append(time.time())
+                            print(l_t[-1])
+                        if len(l_t) == 2:
+                            print(l_t[1] - l_t[0], "--------")
+                            if l_t[1] - l_t[0] < 0.4 and l_b == block:
+                                #block.start()
+                                dic = block.get_par()
+                                dic = other_functions.pop_up(screen,dic,clock)
+                                block.start(dic)
+                                print("d - clip - active")
+                            l_t[:] = []
+
+
+                        l_b = block
 
             action_button(event)
 
@@ -90,7 +110,7 @@ def main():
         # Draw the vertical line
         #pygame.draw.rect(screen, defines.BLACK, line)
         other_functions.draw_other_blocks(line, screen, green_button, red_button)
-
+        
         #play logic for each block
 
 
