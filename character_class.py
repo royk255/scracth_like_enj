@@ -141,6 +141,34 @@ class Character:
             for block in li:
                 block.logic(self)
 
+
+    def ret_len_list(self):
+        list_len = [len(i) for i in self.cmds]
+        return max(list_len)
+
+    def handle_list(self,lis):
+        for a in lis:
+            a.logic(self)
+            yield
+
+    def start(self):
+        self.list_of_gen = [self.handle_list(i) for i in self.cmds]
+        self.x = 100
+        self.y = 100
+
+    def handle_character(self):
+        temp = []
+        for g in self.list_of_gen:
+            try:
+                res = next(g)
+                temp.append(g)
+            except:
+                pass
+        self.list_of_gen = temp
+        return len(self.list_of_gen)
+
+
+
     def update_following_offset(self, following,event):
             #li, place = self.find_block(following[0])
             for i,block in enumerate(following):

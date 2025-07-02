@@ -15,6 +15,10 @@ def add_blocks(blocks, current_character):
             blocks.append(block_classes.move_character(x, y, (150, 50)))
         elif defines.BLOCKS_TEXT[i] == "Turn Left":
             blocks.append(block_classes.turn_character(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Turn Right":
+            blocks.append(block_classes.turn_character(x, y, (150, 50), "right"))
+        elif defines.BLOCKS_TEXT[i] == "Wait 1 Second":
+            blocks.append(block_classes.wait_character(x, y, (150, 50)))
         else:
             blocks.append(block_classes.BlockType(x, y, defines.BLOCKS_TEXT[i], "Motion", (150, 50), current_character))
 

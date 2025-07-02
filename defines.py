@@ -17,10 +17,11 @@ SAFE_BLOCKS_LOC = LINE_X + 50
 
 BLOCKS_TEXT = [
     "Move 10 Steps",
-    "Jump",
-    "Turn Left",
-    "Turn Right",
-    "Move Backward"
+    #"Jump",
+    #"Turn Left",
+    #"Turn Right",
+    #"Move Backward"
+    "Wait 1 Second"
 ]
 
 

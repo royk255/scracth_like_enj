@@ -10,7 +10,8 @@ from button_class import Button
 import new_block_class
 from new_block_class import BlockType, move_character, turn_character
 import other_functions
-
+import threading
+import time
 
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 pygame.init()
@@ -43,12 +44,17 @@ def action_button(event):
         green_button.turn_off()
         red_button.turn_off()
 
+def draw_blocks(blocks, screen):
+    for block in blocks:
+        block.draw(screen)
+
 def main():
     list_of_characters = []
-    list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character_2.png", 0, 0))
+    list_of_characters.append(Character("C:\\Data\\roy\\my_projects\\game_enj_sc_like\\scracth_like_enj\\defult_character_2.png", 200, 200))
     character = list_of_characters[0]
     running = True
     side_blocks = []
+    global action
     other_functions.add_blocks(side_blocks, character)
     while running:
         add_block = []
@@ -75,10 +81,8 @@ def main():
             action_button(event)
 
         screen.fill(defines.WHITE)
-        for block in side_blocks:
-            block.draw(screen)
-        for character in list_of_characters:
-            character.draw(screen)
+        draw_blocks(side_blocks, screen)
+        draw_blocks(list_of_characters, screen)
         for li in character.cmds:
             for block in li:
                 block.draw(screen)
@@ -89,8 +93,43 @@ def main():
 
         #play logic for each block
 
+
         if action:
-            character.active_logic()
+
+            lis_ch=[]
+            for c in list_of_characters:
+                c.start()
+                lis_ch.append(c)
+            screen.fill(defines.WHITE)
+            draw_blocks(list_of_characters, screen)
+            pygame.display.flip()
+
+            #character.active_logic(screen)
+            
+            time.sleep(1)
+            while len(lis_ch) > 0 and action:
+                lis_ch_temp = []
+                for c in lis_ch:
+                    try:
+                        if c.handle_character() > 0:
+                            lis_ch_temp.append(c)
+                    except:
+                        pass
+                lis_ch = lis_ch_temp
+                screen.fill(defines.WHITE)
+                draw_blocks(list_of_characters, screen)
+                pygame.display.flip()
+                action_button(event)
+
+            """for li in character.cmds:
+                for block in li:
+                    block.logic(character)
+                    screen.fill(defines.WHITE)
+                    draw_blocks(list_of_characters, screen)
+                    draw_blocks(side_blocks, screen)
+                    pygame.display.flip()"""
+
+            action = False
         pygame.display.flip()
         clock.tick(60)
 

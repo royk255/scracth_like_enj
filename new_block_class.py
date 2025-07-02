@@ -3,6 +3,7 @@ import defines
 import os
 import sys
 import block_classes
+import time
 
 
 class Block:
@@ -112,6 +113,9 @@ class Block:
     def start(self):
         pass
 
+    def get_skip(self):
+        return False
+
 
 class BlockType(Block):
     def __init__(self, x, y, text, type, size, color=defines.BLUE):
@@ -129,7 +133,7 @@ class BlockType(Block):
 class move_character(BlockType):
     def __init__(self, x, y, size):
         super().__init__(x, y, "move_character", "Motion", size)
-        self.param1 = 10
+        self.param1 = 100
         self.has_param = 1
     
     def dup(self):
@@ -140,8 +144,8 @@ class move_character(BlockType):
         if self.param1.isdigit():
             self.param1 = int(self.param1)
         else:
-            print("Invalid input, using default value of 10")
-            self.param1 = 10
+            print("Invalid input, using default value of 100")
+            self.param1 = 100
         print(self.param1)
     
     def logic(self, target):
@@ -155,6 +159,9 @@ class turn_character(BlockType):
         super().__init__(x, y, "turn_character", "Motion", size)
         self.param1 = 10
         self.has_param = 1
+
+    def dup(self):
+        return turn_character(self.rect.x, self.rect.y, self.rect.size)
 
     def start(self):
         self.get_input()
@@ -170,7 +177,52 @@ class turn_character(BlockType):
         pass
 
 
+class jump_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "jump_character", "Motion", size)
+        self.param1 = 100
+        self.has_param = 1
 
+    def dup(self):
+        return jump_character(self.rect.x, self.rect.y, self.rect.size)
+    
+
+    def start(self):
+        self.get_input()
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 100")
+            self.param1 = 100
+        #print(self.param1)
+
+    def logic(self, target):
+        #print(self.param1)
+        for i in range(self.param1):
+            target.move(0, 1)
+        for i in range(self.param1):
+            target.move(0, -1)
+
+class wait_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "wait_character", "Control", size)
+        self.param1 = 1
+        self.has_param = 1
+
+    def dup(self):
+        return wait_character(self.rect.x, self.rect.y, self.rect.size)   
+
+    def start(self):
+        self.get_input()
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 1000")
+            self.param1 = 1
+
+    def logic(self, target):
+        #time.sleep(self.param1)
+        pygame.time.delay(self.param1 * 1000)
 
 
 
