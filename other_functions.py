@@ -13,6 +13,16 @@ def add_blocks(blocks, current_character):
         y = 20 + (i * 60)  
         if defines.BLOCKS_TEXT[i] == "Move 10 Steps":
             blocks.append(block_classes.move_character(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Go to Mouse":
+            blocks.append(block_classes.go_to_mouse(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Go to Random Position":
+            blocks.append(block_classes.go_to_random(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Go to X: 0 Y: 0":
+            blocks.append(block_classes.set_x_y_character(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Set X to 0":
+            blocks.append(block_classes.set_x_character(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Set Y to 0":
+            blocks.append(block_classes.set_y_character(x, y, (150, 50)))
         elif defines.BLOCKS_TEXT[i] == "Turn Left":
             blocks.append(block_classes.turn_character(x, y, (150, 50)))
         elif defines.BLOCKS_TEXT[i] == "Turn Right":
@@ -35,26 +45,35 @@ def transparentSurface(size):
     surface.fill((0, 0, 0, 0))
     return surface
 
+
+def check_param(param, x=True):
+    if isinstance(param, str):
+        if param.isdigit() and int(param) > 0:
+            if int(param) < defines.FULL_SCREEN_WIDTH and x:
+                return True
+            elif int(param) < defines.FULL_SCREEN_HEIGHT:
+                return True
+        return False
+
+
 def pop_up(screen,parm, clock):
-
-    alpha_surface =  transparentSurface(screen.get_size())
-    pygame.draw.rect(alpha_surface, (100,100,100,100),pygame.Rect(0, 0, defines.FULL_SCREEN_WIDTH, defines.FULL_SCREEN_HEIGHT), border_radius=10)
-    
-
-    box = pygame.Rect(defines.HALF_SCREEN_WIDTH*0.75,defines.HALF_SCREEN_HEIGHT*0.75, defines.HALF_SCREEN_WIDTH//2, defines.HALF_SCREEN_HEIGHT//2)
-    pygame.draw.rect(alpha_surface,defines.WHITE, box)
-    #pygame.display.flip()
-    font = pygame.font.Font(None, 32)
-
-    input_box = pygame.Rect(defines.HALF_SCREEN_WIDTH*0.9, defines.HALF_SCREEN_HEIGHT*0.9+60, 140, 32)
-    color_inactive = pygame.Color('lightskyblue3')
-    color_active = pygame.Color('dodgerblue2')
-    color = color_inactive
-    active = False
-    text = ''
-    done = False
     for t in parm:
+        alpha_surface =  transparentSurface(screen.get_size())
+        pygame.draw.rect(alpha_surface, (100,100,100,100),pygame.Rect(0, 0, defines.FULL_SCREEN_WIDTH, defines.FULL_SCREEN_HEIGHT), border_radius=10)
+        
+
+        box = pygame.Rect(defines.HALF_SCREEN_WIDTH*0.75,defines.HALF_SCREEN_HEIGHT*0.75, defines.HALF_SCREEN_WIDTH//2, defines.HALF_SCREEN_HEIGHT//2)
+        pygame.draw.rect(alpha_surface,defines.WHITE, box)
+        #pygame.display.flip()
+        font = pygame.font.Font(None, 32)
+
+        input_box = pygame.Rect(defines.HALF_SCREEN_WIDTH*0.9, defines.HALF_SCREEN_HEIGHT*0.9+60, 140, 32)
+        color_inactive = pygame.Color('lightskyblue3')
+        color_active = pygame.Color('dodgerblue2')
+        color = color_inactive
+        active = False
         done = False
+        text = ''
         while not done:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -69,8 +88,14 @@ def pop_up(screen,parm, clock):
                     if active:
                         if event.key == pygame.K_RETURN:
                             #print(text)
-                            parm[t] = text
+                            if check_param(text, t == "x"):
+                                print(f"Parameter {t} set to {text}")
+                                parm[t] = text
+                            else:
+                                print(f"Invalid input for {t}: {text}")
                             done = True
+                            
+                            
                         elif event.key == pygame.K_BACKSPACE:
                             text = text[:-1]
                         else:

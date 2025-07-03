@@ -59,6 +59,7 @@ def main():
     global action
     l_t = []
     l_b = None
+    d = False
     other_functions.add_blocks(side_blocks, character)
     while running:
         add_block = []
@@ -77,9 +78,14 @@ def main():
                 for block in li:
                     res = block.handle_event(event, add_block)
                     if res == 1:  #up
-                        character.snap_to_blocks(block)
+                        if not d:
+                            character.snap_to_blocks(block)
+                        else:
+                            d = False
+                        
                     elif res == 2: #move
-                        character.update_following_pos(character.get_following(block),event)
+                        if not d:
+                            character.update_following_pos(character.get_following(block),event)
                     elif res == 3: #down
                         character.update_following_offset(character.get_following(block), event)
                         if len(l_t) < 2:
@@ -92,10 +98,9 @@ def main():
                                 dic = block.get_par()
                                 dic = other_functions.pop_up(screen,dic,clock)
                                 block.start(dic)
+                                d = True
                                 print("d - clip - active")
-                            l_t[:] = []
-
-
+                            del l_t[0]
                         l_b = block
 
             action_button(event)
@@ -150,6 +155,10 @@ def main():
                     pygame.display.flip()"""
 
             action = False
+            time.sleep(0.5)
+        for c in list_of_characters:
+            c.start()
+            
         pygame.display.flip()
         clock.tick(60)
 

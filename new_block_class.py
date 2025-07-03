@@ -37,7 +37,7 @@ class Block:
                     new_block = self.dup()
                     new_block.update_position(defines.HALF_SCREEN_WIDTH, defines.HALF_SCREEN_HEIGHT)
                     blocks.append(new_block)
-            return 3
+                return 3
 
         elif event.type == pygame.MOUSEBUTTONUP:
             if self.dragging:
@@ -186,5 +186,97 @@ class wait_character(BlockType):
         pygame.time.delay(self.param1 * 1000)
 
 
+class set_x_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "set_x", "Motion", size)
+        self.param1 = 100
+        self.has_param = 1
+
+    def get_par(self):
+        return {"x" : self.param1}
+
+    def dup(self):
+        return set_x_character(self.rect.x, self.rect.y, self.rect.size)
+
+    def start(self, parm_dic):
+        self.param1 = parm_dic["x"]
+        self.param1 = int(self.param1)
+
+    def logic(self, target):
+        target.set_position(self.param1, target.rect.y)
+
+class set_y_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "set_y", "Motion", size)
+        self.param1 = 100
+        self.has_param = 1
+
+    def get_par(self):
+        return {"y" : self.param1}
+
+    def dup(self):
+        return set_y_character(self.rect.x, self.rect.y, self.rect.size)
+
+    def start(self, parm_dic):
+        self.param1 = parm_dic["y"]
+        if self.param1.isdigit():
+            self.param1 = int(self.param1)
+        else:
+            print("Invalid input, using default value of 100")
+            self.param1 = 100
+
+    def logic(self, target):
+        target.set_position(target.rect.x, self.param1)
+
+class set_x_y_character(BlockType):
+    def __init__(self, x, y, size,text="set_x_y"):
+        super().__init__(x, y, text, "Motion", size)
+        self.params = {"x" : 100, "y" : 100}
+        self.has_param = 2
+
+    def get_par(self):
+        return self.params
+
+    def dup(self):
+        return set_x_y_character(self.rect.x, self.rect.y, self.rect.size)
+
+    def start(self, parm_dic):
+        self.params = parm_dic
+        for key in self.params:
+            if not self.params[key].isdigit():
+                print(f"Invalid input for {key}, using default value of 100")
+                self.params[key] = 100
+            else:
+                self.params[key] = int(self.params[key])
+    def logic(self, target,param_dic=None):
+        self.params = param_dic if param_dic else self.params
+        target.set_position(self.params["x"], self.params["y"])
+
+import random
+
+class go_to_random(set_x_y_character):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, size,"got to random")
+        self.has_param = 0
+
+    def dup(self):
+        return go_to_random(self.rect.x, self.rect.y, self.rect.size)
+    
+    def logic(self, target, param_dic=None):
+        param_dic = {"x": random.randint(0, defines.FULL_SCREEN_WIDTH), "y": random.randint(0, defines.FULL_SCREEN_HEIGHT)}
+        return super().logic(target, param_dic)
+
+class go_to_mouse(set_x_y_character):
+    def __init__(self, x, y, size):
+
+        super().__init__(x, y, size, "go to mouse")
+        self.has_param = 0
+
+    def dup(self):
+        return go_to_mouse(self.rect.x, self.rect.y, self.rect.size)
+    
+    def logic(self, target, param_dic=None):
+        param_dic = {"x": pygame.mouse.get_pos()[0], "y": pygame.mouse.get_pos()[1]}
+        return super().logic(target, param_dic)
 
 
