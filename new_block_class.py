@@ -4,7 +4,7 @@ import os
 import sys
 import block_classes
 import time
-
+import pyautogui
 
 class Block:
     def __init__(self, x, y, text, type, size, color=defines.BLUE):
@@ -175,11 +175,7 @@ class wait_character(BlockType):
 
     def start(self, parm_dic):
         self.param1 = parm_dic["wait"]
-        if self.param1.isdigit():
-            self.param1 = int(self.param1)
-        else:
-            print("Invalid input, using default value of 1000")
-            self.param1 = 1
+        self.param1 = int(self.param1)
 
     def logic(self, target):
         #time.sleep(self.param1)
@@ -250,7 +246,7 @@ class set_x_y_character(BlockType):
                 self.params[key] = int(self.params[key])
     def logic(self, target,param_dic=None):
         self.params = param_dic if param_dic else self.params
-        target.set_position(self.params["x"], self.params["y"])
+        target.set_position(self.params["x"]+(target.get_char_size()[0]//2), self.params["y"]+(target.get_char_size()[1]//2))
 
 import random
 
@@ -274,9 +270,46 @@ class go_to_mouse(set_x_y_character):
 
     def dup(self):
         return go_to_mouse(self.rect.x, self.rect.y, self.rect.size)
-    
+
     def logic(self, target, param_dic=None):
-        param_dic = {"x": pygame.mouse.get_pos()[0], "y": pygame.mouse.get_pos()[1]}
+        x, y = pyautogui.position()
+        param_dic = {"x": x, "y": y}
         return super().logic(target, param_dic)
 
+class set_rotation_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "set_rotation", "Motion", size)
+        self.param1 = 90
+        self.has_param = 1
 
+    def get_par(self):
+        return {"rotation" : self.param1}
+
+    def dup(self):
+        return set_rotation_character(self.rect.x, self.rect.y, self.rect.size)
+
+    def start(self, parm_dic):
+        self.param1 = parm_dic["rotation"]
+        self.param1 = int(self.param1)
+
+    def logic(self, target):
+        target.set_rotation(self.param1)
+
+class add_rotation_character(BlockType):
+    def __init__(self, x, y, size):
+        super().__init__(x, y, "turn", "Motion", size)
+        self.param1 = 90
+        self.has_param = 1
+
+    def get_par(self):
+        return {"rotation" : self.param1}
+
+    def dup(self):
+        return add_rotation_character(self.rect.x, self.rect.y, self.rect.size)
+
+    def start(self, parm_dic):
+        self.param1 = parm_dic["rotation"]
+        self.param1 = int(self.param1)
+
+    def logic(self, target):
+        target.add_rotation(self.param1)

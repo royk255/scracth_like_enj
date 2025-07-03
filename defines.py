@@ -22,6 +22,8 @@ BLOCKS_TEXT = [
     "Go to X: 0 Y: 0",
     "Set X to 0",
     "Set Y to 0",
+    "Set Rotation to 90",
+    "Turn",
     "Wait 1 Second"
 ]
 

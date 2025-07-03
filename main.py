@@ -99,6 +99,7 @@ def main():
                                 dic = other_functions.pop_up(screen,dic,clock)
                                 block.start(dic)
                                 d = True
+                                del l_t[0]
                                 print("d - clip - active")
                             del l_t[0]
                         l_b = block
@@ -133,6 +134,8 @@ def main():
             
             time.sleep(1)
             while len(lis_ch) > 0 and action:
+                x,y = pygame.mouse.get_pos()
+                print(x,y)
                 lis_ch_temp = []
                 for c in lis_ch:
                     try:

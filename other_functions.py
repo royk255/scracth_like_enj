@@ -27,6 +27,10 @@ def add_blocks(blocks, current_character):
             blocks.append(block_classes.turn_character(x, y, (150, 50)))
         elif defines.BLOCKS_TEXT[i] == "Turn Right":
             blocks.append(block_classes.turn_character(x, y, (150, 50), "right"))
+        elif defines.BLOCKS_TEXT[i] == "Set Rotation to 90":
+            blocks.append(block_classes.set_rotation_character(x, y, (150, 50)))
+        elif defines.BLOCKS_TEXT[i] == "Turn":
+            blocks.append(block_classes.add_rotation_character(x, y, (150, 50)))
         elif defines.BLOCKS_TEXT[i] == "Wait 1 Second":
             blocks.append(block_classes.wait_character(x, y, (150, 50)))
         else:
@@ -46,12 +50,14 @@ def transparentSurface(size):
     return surface
 
 
-def check_param(param, x=True):
+def check_param(param, t):
     if isinstance(param, str):
         if param.isdigit() and int(param) > 0:
-            if int(param) < defines.FULL_SCREEN_WIDTH and x:
+            if int(param) < defines.FULL_SCREEN_WIDTH and t == "x":
                 return True
-            elif int(param) < defines.FULL_SCREEN_HEIGHT:
+            elif int(param) < defines.FULL_SCREEN_HEIGHT and t == "y":
+                return True
+            elif t == "rotation" and (param.isdigit() or (param.startswith('-') and param[1:].isdigit())):
                 return True
         return False
 
@@ -88,7 +94,7 @@ def pop_up(screen,parm, clock):
                     if active:
                         if event.key == pygame.K_RETURN:
                             #print(text)
-                            if check_param(text, t == "x"):
+                            if check_param(text, t):
                                 print(f"Parameter {t} set to {text}")
                                 parm[t] = text
                             else:

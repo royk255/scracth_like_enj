@@ -48,6 +48,10 @@ class Character:
     def set_rotation(self, angle):
         self.rotation = angle % 360
         self.update_rect()
+    
+    def add_rotation(self, angle):
+        self.rotation = (self.rotation + angle) % 360
+        self.update_rect()
 
     def flip(self):
         self.facing_right = not self.facing_right
@@ -62,6 +66,9 @@ class Character:
 
     def get_hitbox(self):
         return self.rect
+
+    def get_char_size(self):
+        return self.image.get_width(), self.image.get_height()
 
     def collides_with(self, other_rect):
         return self.rect.colliderect(other_rect)
@@ -153,8 +160,13 @@ class Character:
 
     def start(self):
         self.list_of_gen = [self.handle_list(i) for i in self.cmds]
+        self.rotation = 0
         self.x = 100
         self.y = 100
+
+    def rotate(self, angle):
+        self.rotation = (self.rotation + angle) % 360
+        self.update_rect()
 
     def handle_character(self):
         temp = []
