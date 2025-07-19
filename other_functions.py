@@ -108,6 +108,12 @@ def pop_up(screen,parm, clock):
                             
                         elif event.key == pygame.K_BACKSPACE:
                             text = text[:-1]
+                            # Clear the previous text by filling the input area with white before rendering new text
+                            pygame.draw.rect(alpha_surface, defines.WHITE, input_box)
+                            # Re-render the previous text so it stays visible until deleted
+                            txt_surface = font.render(text, True, color)
+                            alpha_surface.blit(txt_surface, (input_box.x+5, input_box.y+5))
+
                         else:
                             text += event.unicode
 
