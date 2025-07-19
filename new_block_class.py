@@ -97,11 +97,7 @@ class move_character(BlockType):
 
     def start(self, parm):
         self.param1 = parm["steps"]
-        if self.param1.isdigit():
-            self.param1 = int(self.param1)
-        else:
-            print("Invalid input, using default value of 100")
-            self.param1 = 100
+        self.param1 = int(self.param1)
         print(self.param1)
     
     def logic(self, target):
@@ -179,7 +175,8 @@ class wait_character(BlockType):
 
     def logic(self, target):
         #time.sleep(self.param1)
-        pygame.time.delay(self.param1 * 1000)
+        #pygame.time.delay(self.param1 * 1000)
+        return "wait " + str(time.time() + self.param1)
 
 
 class set_x_character(BlockType):
@@ -246,7 +243,7 @@ class set_x_y_character(BlockType):
                 self.params[key] = int(self.params[key])
     def logic(self, target,param_dic=None):
         self.params = param_dic if param_dic else self.params
-        target.set_position(self.params["x"]+(target.get_char_size()[0]//2), self.params["y"]+(target.get_char_size()[1]//2))
+        target.set_position(self.params["x"]+(target.get_char_size()[0]//10), self.params["y"]+(target.get_char_size()[1]//10))
 
 import random
 

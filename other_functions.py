@@ -59,6 +59,10 @@ def check_param(param, t):
                 return True
             elif t == "rotation" and (param.isdigit() or (param.startswith('-') and param[1:].isdigit())):
                 return True
+            elif t == "wait" and (param.isdigit()):
+                return True
+            elif t == "steps" and (param.isdigit()):
+                return True
         return False
 
 

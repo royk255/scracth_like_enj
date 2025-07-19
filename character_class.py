@@ -1,5 +1,9 @@
 import pygame
 import os
+import time
+
+
+
 class Character:
     def __init__(self, image_path, x=0, y=0, rotation=0, scale=1.0, facing_right=True):
         self.image_original = pygame.image.load(image_path).convert_alpha()
@@ -17,6 +21,7 @@ class Character:
         self.rotation = rotation
         self.update_rect()
         self.cmds = []
+        self.pause = {}
 
     def update_rect(self):
         img = pygame.transform.rotate(self.image_original, -self.rotation)
@@ -155,8 +160,8 @@ class Character:
 
     def handle_list(self,lis):
         for a in lis:
-            a.logic(self)
-            yield
+            res = a.logic(self)
+            yield (res, lis, a)
 
     def start(self):
         self.list_of_gen = [self.handle_list(i) for i in self.cmds]
@@ -170,14 +175,24 @@ class Character:
 
     def handle_character(self):
         temp = []
+        l_to_del = []
         for g in self.list_of_gen:
             try:
                 res = next(g)
-                temp.append(g)
+                if res[0] is not None and res[0].startswith("wait"):
+                    self.pause[res[0].split(" ")[1]] = [res[1], res[1].index(res[2])+1] 
+                else:
+                    temp.append(g)
             except:
                 pass
+        for l in self.pause:
+            if float(l) < time.time():
+                temp.append(self.handle_list(self.pause[l][0][self.pause[l][1]:]))
+                l_to_del.append(l)
         self.list_of_gen = temp
-        return len(self.list_of_gen)
+        for l in l_to_del:
+            del self.pause[l]
+        return len(self.list_of_gen) + len(self.pause)
 
 
 
