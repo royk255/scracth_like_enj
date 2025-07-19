@@ -82,6 +82,9 @@ def main():
                             character.snap_to_blocks(block)
                         else:
                             d = False
+                        if event.pos[0] > defines.SAFE_BLOCKS_LOC:
+                            character.remove_list(character.get_following(block))
+                            character.clean_up()
                         
                     elif res == 2: #move
                         if not d:
